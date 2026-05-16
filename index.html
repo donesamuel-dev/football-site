@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoalTime - Live Football Scores</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #0a0e1a;
+            color: #fff;
+            line-height: 1.6;
+        }
+        header {
+            background: #1e293b;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #22c55e;
+        }
+        header h1 { color: #22c55e; font-size: 2rem; }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 15px;
+        }
+        .match {
+            background: #1e293b;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .match:hover { background: #334155; }
+        .team { font-weight: 600; }
+        .score {
+            background: #22c55e;
+            color: #0a0e1a;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .time { color: #94a3b8; font-size: 0.9rem; }
+        .loading { text-align: center; padding: 50px; color: #94a3b8; }
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #94a3b8;
+            border-top: 1px solid #334155;
+            margin-top: 50px;
+        }
+        .ads {
+            background: #1e293b;
+            height: 90px;
+            margin: 30px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            border: 1px dashed #334155;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⚽ GoalTime</h1>
+        <p>Live Football Scores & Results</p>
+    </header>
+
+    <div class="container">
+        <h2 style="margin-bottom: 20px;">Today's Matches</h2>
+        <div id="matches" class="loading">Loading matches...</div>
+        
+        <div class="ads">Ad Space - Replace with AdSense when approved</div>
+    </div>
+
+    <footer>
+        <p>© 2026 GoalTime. Data from API-Football</p>
+    </footer>
+
+    <script>
+        const API_KEY = 'YOUR_API_KEY_HERE'; // Get free key at api-football.com
+        const API_URL = 'https://v3.football.api-sports.io/fixtures?live=all';
+
+        async function loadMatches() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'GET',
+                    headers: {
+                        'x-apisports-key': API_KEY
+                    }
+                });
+                
+                const data = await response.json();
+                const matchesDiv = document.getElementById('matches');
+                
+                if (data.response.length === 0) {
+                    matchesDiv.innerHTML = '<p>No live matches right now. Check back later.</p>';
+                    return;
+                }
+                
+                matchesDiv.innerHTML = data.response.slice(0, 10).map(match => `
+                    <div class="match">
+                        <div>
+                            <div class="team">${match.teams.home.name} vs ${match.teams.away.name}</div>
+                            <div class="time">${match.league.name} - ${match.league.country}</div>
+                        </div>
+                        <div class="score">${match.goals.home} - ${match.goals.away}</div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                document.getElementById('matches').innerHTML = '<p>Failed to load matches. Try refreshing.</p>';
+            }
+        }
+
+        loadMatches();
+        setInterval(loadMatches, 60000); // Refresh every 60s
+    </script>
+</body>
+  </html>
